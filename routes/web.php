@@ -5,12 +5,16 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\VerificarController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('events.index'));
 
 Route::get('/eventos', [PublicEventController::class, 'index'])->name('events.index');
 Route::get('/eventos/{event:slug}', [PublicEventController::class, 'show'])->name('events.show');
+
+Route::get('/verificar', [VerificarController::class, 'index'])->name('verificar');
+Route::post('/verificar', [VerificarController::class, 'buscar'])->name('verificar.buscar');
 
 Route::middleware(['auth'])->group(function () {
 
@@ -33,6 +37,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('events', EventController::class);
         Route::post('events/{event}/tickets', [TicketController::class, 'store'])->name('events.tickets.store');
         Route::delete('tickets/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
+        Route::get('events/{event}/asistentes', [EventController::class, 'attendees'])->name('events.attendees');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

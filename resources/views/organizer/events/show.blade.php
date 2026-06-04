@@ -11,6 +11,9 @@
         <a href="{{ route('events.show', $event->slug) }}" class="btn btn-outline-dark btn-sm" target="_blank">
             <i class="bi bi-eye me-1"></i>Ver público
         </a>
+        <a href="{{ route('organizer.events.attendees', $event) }}" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-people me-1"></i>Ver asistentes
+        </a>
     </div>
 </div>
 

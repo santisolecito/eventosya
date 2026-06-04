@@ -102,6 +102,18 @@ class EventController extends Controller
             ->with('success', 'Evento eliminado.');
     }
 
+    public function attendees(Event $event)
+    {
+        $this->authorizeOrganizer($event);
+        $registrations = \App\Models\Registration::with('user', 'ticket')
+            ->whereHas('ticket', fn($q) => $q->where('event_id', $event->id))
+            ->where('status', 'active')
+            ->latest()
+            ->paginate(15);
+
+        return view('organizer.events.attendees', compact('event', 'registrations'));
+    }
+
     private function authorizeOrganizer(Event $event): void
     {
         if ($event->organizer_id !== Auth::id() && !Auth::user()->isAdmin()) {

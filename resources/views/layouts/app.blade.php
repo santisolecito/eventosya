@@ -25,6 +25,11 @@
                         <i class="bi bi-search me-1"></i>Explorar eventos
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('verificar') }}">
+                        <i class="bi bi-patch-check me-1"></i>Verificar entrada
+                    </a>
+                </li>
             </ul>
             <ul class="navbar-nav ms-auto align-items-center gap-1">
                 @guest
