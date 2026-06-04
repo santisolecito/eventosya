@@ -50,18 +50,30 @@
 
 <div class="mb-3">
     <label class="form-label">Descripción <span class="text-danger">*</span></label>
-    <textarea name="description" rows="4" class="form-control @error('description') is-invalid @enderror" required>{{ old('description', $event->description ?? '') }}</textarea>
-    @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    <small class="text-muted d-block mb-1">Describe el evento con detalle: agenda, ponentes, requisitos, qué incluye, etc.</small>
+    <textarea name="description" rows="8" maxlength="2000"
+        class="form-control @error('description') is-invalid @enderror"
+        id="description" required>{{ old('description', $event->description ?? '') }}</textarea>
+    <div class="d-flex justify-content-between mt-1">
+        <div>@error('description') <div class="text-danger small">{{ $message }}</div> @enderror</div>
+        <small class="text-muted"><span id="charCount">0</span>/2000 caracteres</small>
+    </div>
 </div>
 
 <div class="mb-3">
     <label class="form-label">Imagen de portada</label>
-    <input type="file" name="cover_image" class="form-control @error('cover_image') is-invalid @enderror" accept="image/*">
+    <small class="text-muted d-block mb-1">Sube una imagen atractiva del evento (JPG, PNG). Tamaño recomendado: 1200x600px.</small>
+    <input type="file" name="cover_image" class="form-control @error('cover_image') is-invalid @enderror" accept="image/*" id="cover_image">
     @if(isset($event) && $event->cover_image)
         <div class="mt-2">
-            <img src="{{ Storage::url($event->cover_image) }}" class="img-thumbnail" style="height:100px;">
+            <img src="{{ Storage::url($event->cover_image) }}" class="img-thumbnail" style="height:120px;">
+            <small class="text-muted d-block">Deja vacío para mantener la imagen actual.</small>
         </div>
     @endif
+    <div id="preview_container" class="mt-2" style="display:none;">
+        <img id="preview_img" class="img-thumbnail" style="height:120px;">
+        <small class="text-muted d-block">Vista previa de la nueva imagen.</small>
+    </div>
     @error('cover_image') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
 
@@ -70,3 +82,28 @@
         @checked(old('active', $event->active ?? true))>
     <label class="form-check-label" for="active">Evento activo (visible al público)</label>
 </div>
+
+@push('scripts')
+<script>
+    // Contador de caracteres
+    const textarea = document.getElementById('description');
+    const counter = document.getElementById('charCount');
+    counter.textContent = textarea.value.length;
+    textarea.addEventListener('input', () => {
+        counter.textContent = textarea.value.length;
+    });
+
+    // Vista previa de imagen
+    document.getElementById('cover_image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview_img').src = e.target.result;
+                document.getElementById('preview_container').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+@endpush
