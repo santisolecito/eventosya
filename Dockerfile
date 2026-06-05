@@ -1,4 +1,4 @@
-FROM php:8.4-apache
+FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip libpng-dev \
@@ -6,8 +6,6 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-RUN a2enmod rewrite
 
 WORKDIR /var/www/html
 COPY . .
@@ -17,14 +15,6 @@ RUN composer install --optimize-autoloader --no-dev --no-interaction
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-RUN echo '<VirtualHost *:80>\n\
-    DocumentRoot /var/www/html/public\n\
-    <Directory /var/www/html/public>\n\
-        AllowOverride All\n\
-        Require all granted\n\
-    </Directory>\n\
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+EXPOSE 8000
 
-EXPOSE 80
-
-CMD php artisan config:clear && php artisan migrate --force && sed -i "s/80/${PORT:-80}/g" /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf && apache2-foreground
+CMD php artisan config:clear && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
